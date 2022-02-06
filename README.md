@@ -15,4 +15,4 @@ Launches an EC2 instance on AWS and processes OpenStreetMap data with Planetiler
  * TARGET_HOST - the host where the generated output file should be copied to. E.g. `my-server.com`
  * TARGET_USERNAME - the username on the target machine.
  * TARGET_SSH_PRIVATE_KEY - the private key to access the target machine.
- * TARGET_FOLDER - the folder path on on the target machine where the output file is copied to.
+ * TARGET_FOLDER - the folder path on the target machine where the output file is copied to.
