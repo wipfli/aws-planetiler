@@ -76,7 +76,7 @@ jobs:
           script_stop: true
           script: |
             cat <<EOF > .ssh/target
-            "${{ secrets.TARGET_SSH_PRIVATE_KEY }}"
+            ${{ secrets.TARGET_SSH_PRIVATE_KEY }}
             EOF
             chmod 600 .ssh/target
             eval `ssh-agent`
