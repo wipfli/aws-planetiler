@@ -14,5 +14,5 @@ Launches an EC2 instance on AWS and processes OpenStreetMap data with Planetiler
  * AWS_SUBNET_ID - the [subnet id](https://docs.aws.amazon.com/cli/latest/reference/ec2/describe-subnets.html). E.g. `subnet-1a2b3c4d`
  * TARGET_HOST - the host where the generated output file should be copied to. E.g. `my-server.com`
  * TARGET_USERNAME - the username on the target machine.
- * TARGET_SSH_PRIVATE_KEY - the private key to access the target machine. Should be a single line, escape new lines with `\n`.
+ * TARGET_SSH_PRIVATE_KEY - the private key to access the target machine. Should be a single line (no newline characters) and base64 encoded. E.g. output of `cat ~/.ssh/target-private-key.pem | base64` as a single line.
  * TARGET_FOLDER - the folder path on the target machine where the output file is copied to.

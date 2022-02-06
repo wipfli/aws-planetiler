@@ -75,9 +75,7 @@ jobs:
           key: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
           script_stop: true
           script: |
-            cat <<EOF > .ssh/target
-            ${{ secrets.TARGET_SSH_PRIVATE_KEY }}
-            EOF
+            echo "${{ secrets.TARGET_SSH_PRIVATE_KEY }}" | base64 -d > .ssh/target
             chmod 600 .ssh/target
             eval `ssh-agent`
             ssh-add .ssh/target
