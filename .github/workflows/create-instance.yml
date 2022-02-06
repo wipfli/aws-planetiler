@@ -13,5 +13,11 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-2
+          aws-region: ${{ secrets.AWS_REGION }}
+      
+      - name: Create instance
+        run: |
+          aws ec2 run-instances --image-id ${{ secrets.AWS_IMAGE_ID }} --count 1 \
+            --instance-type ${{ secrets.AWS_INSTANCE_TYPE }} --key-name ${{ secrets.AWS_KEY_NAME }} 
+            --security-group-ids ${{ secrets.AWS_INSTANCE_TYPE }} --subnet-id ${{ secrets.AWS_SUBNET_ID }}
   
