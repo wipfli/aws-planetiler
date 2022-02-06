@@ -36,14 +36,17 @@ jobs:
           aws ec2 describe-instances --instance-ids ${{ steps.instance_id.outputs.instance_id }} > describe-instances-output.json
           echo ::set-output name=public_dns_name::$(grep -oP '(?<="PublicDnsName": ")[^"]*' describe-instances-output.json | head -1)
 
-      - name: Print public dns name
-        run: echo ${{ steps.public_dns_name.outputs.public_dns_name }}
-
-      - name: executing remote ssh commands using ssh key
+      - name: Install docker
         uses: appleboy/ssh-action@master
         with:
           host: ${{ steps.public_dns_name.outputs.public_dns_name }}
           username: ec2-user
           key: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
-          script: whoami
+          script_stop: true
+          script: |
+            sudo yum update -y
+            sudo amazon-linux-extras install docker
+            sudo service docker start
+            sudo usermod -a -G docker ec2-user
+            docker info
   
