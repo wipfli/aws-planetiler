@@ -81,5 +81,5 @@ jobs:
 
       - name: Terminate instance
         if: always()
-      - run: |
+        run: |
           aws ec2 terminate-instances --instance-ids ${{ steps.instance_id.outputs.instance_id }}
