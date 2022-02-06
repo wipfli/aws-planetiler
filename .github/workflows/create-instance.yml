@@ -39,4 +39,11 @@ jobs:
       - name: Print public dns name
         run: echo ${{ steps.public_dns_name.outputs.public_dns_name }}
 
+      - name: executing remote ssh commands using ssh key
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ steps.public_dns_name.outputs.public_dns_name }}
+          username: ec2-user
+          key: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
+          script: whoami
   
