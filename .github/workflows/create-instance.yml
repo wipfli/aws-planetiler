@@ -79,4 +79,4 @@ jobs:
             chmod 600 .ssh/target
             eval `ssh-agent`
             ssh-add .ssh/target
-            scp data/output.mbtiles ${{ secrets.TARGET_USERNAME }}@${{ secrets.TARGET_HOST }}:${{ secrets.TARGET_FOLDER }}
+            scp -o StrictHostKeyChecking=no data/output.mbtiles ${{ secrets.TARGET_USERNAME }}@${{ secrets.TARGET_HOST }}:${{ secrets.TARGET_FOLDER }}
