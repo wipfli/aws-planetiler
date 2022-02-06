@@ -19,8 +19,24 @@ jobs:
         run: |
           aws ec2 run-instances --image-id ${{ secrets.AWS_IMAGE_ID }} --count 1 \
             --instance-type ${{ secrets.AWS_INSTANCE_TYPE }} --key-name ${{ secrets.AWS_KEY_NAME }} \
-            --security-group-ids ${{ secrets.AWS_SECURITY_GROUP_IDS }} --subnet-id ${{ secrets.AWS_SUBNET_ID }}
+            --security-group-ids ${{ secrets.AWS_SECURITY_GROUP_IDS }} --subnet-id ${{ secrets.AWS_SUBNET_ID }} \
+            > run-instances-output.json
+
+      - name: Get instance id
+        id: instance_id
+        run: |
+          echo ::set-output name=instance_id::$(grep -oP '(?<="InstanceId": ")[^"]*' run-instances-output.json | head -1)
 
       - name: Wait until instance ready
-        run: aws ec2 wait instance-status-ok
+        run: aws ec2 wait instance-status-ok --instance-ids ${{ steps.instance_id.outputs.instance_id }}
+
+      - name: Get public DNS name
+        id: public_dns_name
+        run: |
+          aws ec2 describe-instances --instance-ids ${{ steps.instance_id.outputs.instance_id }} > describe-instances-output.json
+          echo ::set-output name=public_dns_name::$(grep -oP '(?<="PublicDnsName": ")[^"]*' describe-instances-output.json | head -1)
+
+      - name: Print public dns name
+        run: echo ${{ steps.public_dns_name.outputs.public_dns_name }}
+
   
