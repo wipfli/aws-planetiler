@@ -48,5 +48,21 @@ jobs:
             sudo amazon-linux-extras install docker
             sudo service docker start
             sudo usermod -a -G docker ec2-user
-            docker info
-  
+
+      - name: Run planetiler
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ steps.public_dns_name.outputs.public_dns_name }}
+          username: ec2-user
+          key: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
+          script_stop: true
+          script: |
+            docker run -e \
+              JAVA_TOOL_OPTIONS="-Xmx1g" \
+              -v "$(pwd)/data":/data \
+              ghcr.io/onthegomap/planetiler:latest \
+              --download \
+              --area=monaco \
+              --water-polygons-url=https://github.com/onthegomap/planetiler/raw/main/planetiler-core/src/test/resources/water-polygons-split-3857.zip \
+              --natural-earth-url=https://github.com/onthegomap/planetiler/raw/main/planetiler-core/src/test/resources/natural_earth_vector.sqlite.zip
+            ls data
