@@ -58,8 +58,9 @@ jobs:
           script_stop: true
           script: |
             docker run \
+              --memory=7g \
               -e \
-              JAVA_TOOL_OPTIONS="-Xmx7g -XX:OnOutOfMemoryError="kill -9 %p"" \
+              JAVA_TOOL_OPTIONS="-Xmx6g -Xms6g" \
               -v "$(pwd)/data":/data \
               ghcr.io/onthegomap/planetiler:latest \
               --download \
