@@ -18,6 +18,6 @@ jobs:
       - name: Create instance
         run: |
           aws ec2 run-instances --image-id ${{ secrets.AWS_IMAGE_ID }} --count 1 \
-            --instance-type ${{ secrets.AWS_INSTANCE_TYPE }} --key-name ${{ secrets.AWS_KEY_NAME }} 
+            --instance-type ${{ secrets.AWS_INSTANCE_TYPE }} --key-name ${{ secrets.AWS_KEY_NAME }} \
             --security-group-ids ${{ secrets.AWS_SECURITY_GROUP_IDS }} --subnet-id ${{ secrets.AWS_SUBNET_ID }}
   
