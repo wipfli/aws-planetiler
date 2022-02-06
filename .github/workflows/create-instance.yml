@@ -65,4 +65,13 @@ jobs:
               --area=monaco \
               --water-polygons-url=https://github.com/onthegomap/planetiler/raw/main/planetiler-core/src/test/resources/water-polygons-split-3857.zip \
               --natural-earth-url=https://github.com/onthegomap/planetiler/raw/main/planetiler-core/src/test/resources/natural_earth_vector.sqlite.zip
-            ls data
+            ls -lah data
+
+      - name: SCP output.mbtiles to target
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.TARGET_HOST }}
+          username: ${{ secrets.TARGET_USERNAME }}
+          key: ${{ secrets.TARGET_SSH_PRIVATE_KEY }}
+          source: "data/output.mbiles"
+          target: ${{ secrets.TARGET_FOLDER }}

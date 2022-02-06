@@ -12,3 +12,7 @@ Launches an EC2 instance on AWS and processes OpenStreetMap data with Planetiler
  * AWS_SSH_PRIVATE_KEY - the ssh private key of `AWS_KEY_NAME`. E.g. content of `planetiler-key-pair.pem`
  * AWS_SECURITY_GROUP_IDS - the [security group](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-security-groups.html) id. Make sure to [enable ssh access](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_SecurityGroups.html#SG_Changing_Group_Membership). E.g. `sg-1a2b3c4d`
  * AWS_SUBNET_ID - the [subnet id](https://docs.aws.amazon.com/cli/latest/reference/ec2/describe-subnets.html). E.g. `subnet-1a2b3c4d`
+ * TARGET_HOST - the host where the generated output file should be copied to. E.g. `my-server.com`
+ * TARGET_USERNAME - the username on the target machine.
+ * TARGET_SSH_PRIVATE_KEY - the private key to access the target machine.
+ * TARGET_FOLDER - the folder path on on the target machine where the output file is copied to.
