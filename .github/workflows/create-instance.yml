@@ -68,10 +68,15 @@ jobs:
             ls -lah data
 
       - name: SCP output.mbtiles to target
-        uses: appleboy/scp-action@master
+        uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.TARGET_HOST }}
-          username: ${{ secrets.TARGET_USERNAME }}
-          key: ${{ secrets.TARGET_SSH_PRIVATE_KEY }}
-          source: "data/output.mbiles"
-          target: ${{ secrets.TARGET_FOLDER }}
+          host: ${{ steps.public_dns_name.outputs.public_dns_name }}
+          username: ec2-user
+          key: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
+          script_stop: true
+          script: |
+            echo "${{ secrets.TARGET_SSH_PRIVATE_KEY }}" > .ssh/target
+            chmod 600 .ssh/target
+            eval `ssh-agent`
+            ssh-add .ssh/target
+            scp data/output.mbtiles ${{ secrets.TARGET_USERNAME }}@${{ secrets.TARGET_HOST }}:${{ secrets.TARGET_FOLDER }}
