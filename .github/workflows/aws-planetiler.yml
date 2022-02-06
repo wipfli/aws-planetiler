@@ -78,3 +78,8 @@ jobs:
             eval `ssh-agent`
             ssh-add .ssh/target
             scp -o StrictHostKeyChecking=no data/output.mbtiles ${{ secrets.TARGET_USERNAME }}@${{ secrets.TARGET_HOST }}:${{ secrets.TARGET_FOLDER }}
+
+      - name: Terminate instance
+        if: always()
+      - run: |
+          aws ec2 terminate-instances --instance-ids ${{ steps.instance_id.outputs.instance_id }}
