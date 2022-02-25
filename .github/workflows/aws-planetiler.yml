@@ -101,6 +101,7 @@ jobs:
           host: ${{ steps.public_dns_name.outputs.public_dns_name }}
           username: ec2-user
           key: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
+          command_timeout: 240m
           script_stop: true
           script: |
             cd /mnt
