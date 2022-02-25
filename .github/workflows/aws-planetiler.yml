@@ -60,7 +60,19 @@ jobs:
             sudo service docker start
             sudo usermod -a -G docker ec2-user
 
-      - name: Run planetiler
+      - name: Configure AWS CLI on instance
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ steps.public_dns_name.outputs.public_dns_name }}
+          username: ec2-user
+          key: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
+          script_stop: true
+          script: |
+            aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws configure set default.region  ${{ secrets.AWS_REGION }}
+
+      - name: Run planetiler on Switzerland, copy to S3
         uses: appleboy/ssh-action@master
         with:
           host: ${{ steps.public_dns_name.outputs.public_dns_name }}
@@ -81,45 +93,29 @@ jobs:
               --nodemap-type=sparsearray \
               --nodemap-storage=ram \
               --area=switzerland
-            ls -lah data
-
-      - name: Configure AWS CLI on instance
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ steps.public_dns_name.outputs.public_dns_name }}
-          username: ec2-user
-          key: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
-          script_stop: true
-          script: |
-            aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
-            aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            aws configure set default.region  ${{ secrets.AWS_REGION }}
-
-      - name: Copy output.mbtiles to S3 bucket
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ steps.public_dns_name.outputs.public_dns_name }}
-          username: ec2-user
-          key: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
-          script_stop: true
-          script: |
             aws s3 cp /mnt/data/output.mbtiles s3://planetiler/switzerland.mbtiles
 
-      #- name: SCP output.mbtiles to target
-      #  uses: appleboy/ssh-action@master
-      #  with:
-      #    host: ${{ steps.public_dns_name.outputs.public_dns_name }}
-      #    username: ec2-user
-      #    key: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
-      #    script_stop: true
-      #    script: |
-      #      echo "${{ secrets.TARGET_SSH_PRIVATE_KEY }}" | base64 -d > .ssh/target
-      #      chmod 600 .ssh/target
-      #      eval `ssh-agent`
-      #      ssh-add .ssh/target
-      #      scp -o StrictHostKeyChecking=no /mnt/data/output.mbtiles ${{ secrets.TARGET_USERNAME }}@${{ secrets.TARGET_HOST }}:${{ secrets.TARGET_FOLDER }}
-#
-      #- name: Terminate instance
-      #  if: always()
-      #  run: |
-      #    aws ec2 terminate-instances --instance-ids ${{ steps.instance_id.outputs.instance_id }}
+      - name: Run planetiler on planet, copy to S3
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ steps.public_dns_name.outputs.public_dns_name }}
+          username: ec2-user
+          key: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
+          script_stop: true
+          script: |
+            cd /mnt
+            rm data/output.mbtiles
+            docker run \
+              --memory=120g \
+              -e \
+              JAVA_TOOL_OPTIONS="-Xmx100g -Xms100g" \
+              -v "$(pwd)/data":/data \
+              ghcr.io/onthegomap/planetiler:latest \
+              --download \
+              --download-threads=10 \
+              --download-chunk-size-mb=1000 \
+              --nodemap-type=sparsearray \
+              --nodemap-storage=ram \
+              --area=planet \
+              --bounds=world
+            aws s3 cp /mnt/data/output.mbtiles s3://planetiler/planet.mbtiles
