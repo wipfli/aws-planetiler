@@ -1,4 +1,4 @@
-# aws-planetiler
+# Workflow
 Launches an EC2 instance on AWS and processes OpenStreetMap data with [Planetiler](https://github.com/onthegomap/planetiler)
 
 OpenStreetMap stores and distributes data in a custom [file format](https://wiki.openstreetmap.org/wiki/OSM_file_formats).  [Planetiler](https://github.com/onthegomap/planetiler) transforms OpenStreetMap data into [Mapbox vector tiles](https://docs.mapbox.com/data/tilesets/guides/vector-tiles-introduction/) which can be consumed by map client libraries like [MapLibre GL JS](https://github.com/maplibre/maplibre-gl-js). To process data at the full planet scale, Planetiler requires a machine with 128 GB memory, 500 GB storage, and 32 CPUs. Rendering the planet should take 1 to 3 hours with these machine specs. 
