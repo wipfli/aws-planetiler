@@ -36,6 +36,17 @@ jobs:
           aws ec2 describe-instances --instance-ids ${{ steps.instance_id.outputs.instance_id }} > describe-instances-output.json
           echo ::set-output name=public_dns_name::$(grep -oP '(?<="PublicDnsName": ")[^"]*' describe-instances-output.json | head -1)
 
+      - name: Mount NVMe drive
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ steps.public_dns_name.outputs.public_dns_name }}
+          username: ec2-user
+          key: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
+          script_stop: true
+          script: |
+            sudo mkfs -t xfs /dev/nvme1n1
+            sudo mount /dev/nvme1n1 /mnt
+
       - name: Install docker
         uses: appleboy/ssh-action@master
         with:
@@ -57,6 +68,7 @@ jobs:
           key: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
           script_stop: true
           script: |
+            cd /mnt
             docker run \
               --memory=120g \
               -e \
@@ -71,21 +83,21 @@ jobs:
               --area=switzerland
             ls -lah data
 
-      - name: SCP output.mbtiles to target
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ steps.public_dns_name.outputs.public_dns_name }}
-          username: ec2-user
-          key: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
-          script_stop: true
-          script: |
-            echo "${{ secrets.TARGET_SSH_PRIVATE_KEY }}" | base64 -d > .ssh/target
-            chmod 600 .ssh/target
-            eval `ssh-agent`
-            ssh-add .ssh/target
-            scp -o StrictHostKeyChecking=no data/output.mbtiles ${{ secrets.TARGET_USERNAME }}@${{ secrets.TARGET_HOST }}:${{ secrets.TARGET_FOLDER }}
-
-      - name: Terminate instance
-        if: always()
-        run: |
-          aws ec2 terminate-instances --instance-ids ${{ steps.instance_id.outputs.instance_id }}
+      #- name: SCP output.mbtiles to target
+      #  uses: appleboy/ssh-action@master
+      #  with:
+      #    host: ${{ steps.public_dns_name.outputs.public_dns_name }}
+      #    username: ec2-user
+      #    key: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
+      #    script_stop: true
+      #    script: |
+      #      echo "${{ secrets.TARGET_SSH_PRIVATE_KEY }}" | base64 -d > .ssh/target
+      #      chmod 600 .ssh/target
+      #      eval `ssh-agent`
+      #      ssh-add .ssh/target
+      #      scp -o StrictHostKeyChecking=no /mnt/data/output.mbtiles ${{ secrets.TARGET_USERNAME }}@${{ secrets.TARGET_HOST }}:${{ secrets.TARGET_FOLDER }}
+#
+      #- name: Terminate instance
+      #  if: always()
+      #  run: |
+      #    aws ec2 terminate-instances --instance-ids ${{ steps.instance_id.outputs.instance_id }}
