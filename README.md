@@ -12,13 +12,20 @@ AWS Planetiler is a service which converts `planet.osm.pbf` to `planet.mbtiles` 
 
 <img src="./overview.png" width=650> 
 
+## Assets
+
+|key|last modified | size|
+|-|-|-|
+|planet.mbtiles | 2022-02-25T12:21:25+00:00 | 102537056256 (95.4 GB) |
+|switzerland.mbtiles | 2022-02-25T10:12:56+00:00 | 315125760 (293 MB) |
+
 ## Download Instructions
 
 * Get an [AWS account](https://aws.amazon.com/premiumsupport/knowledge-center/create-and-activate-aws-account/) (required for Requester Pays)
 * Install the [AWS CLI](https://aws.amazon.com/cli/)
 * Run `aws s3api get-object --bucket planetiler --request-payer requester --key planet.mbtiles planet.mbtiles`
 
-This will download the full planet file (60 GB). If you want to test with a smaller file first, you can download data for Switzerland only (300 MB) with `--key switzerland.mbtiles`.
+This will download the full planet file (95 GB). If you want to test with a smaller file first, you can download data for Switzerland only (300 MB) with `--key switzerland.mbtiles`.
 
 ## Run Planetiler Yourself
 
