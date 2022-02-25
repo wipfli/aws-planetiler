@@ -104,7 +104,7 @@ jobs:
           script_stop: true
           script: |
             cd /mnt
-            rm data/output.mbtiles
+            sudo rm data/output.mbtiles
             docker run \
               --memory=120g \
               -e \
